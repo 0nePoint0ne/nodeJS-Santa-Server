@@ -8,7 +8,7 @@ to create a rest api, as well to show ability of using vueJs
 ```
 EMAIL_USERNAME=
 EMAIL_PASSWORD=
-EMAIL_HOST=
+EMAIL_HOST=smtp.ethereal.email
 EMAIL_PORT=587
 PORT=3000
 ```
