@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Admin</title>
+    <meta name="description" content="Admin panel">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- import the webpage's client-side javascript file -->
+    <script src="/vue.min.js"></script>
+    <script src="/axios.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>
+            Admin
+        </h1>
+    </header>
+
+    <main>
+        <div id="app_loops" class="experiment-block">
+            <div class="row">
+                <h4 class="panel-selection-btn" v-on:click="display='children'">Children</h4>
+                <h4 class="panel-selection-btn" v-on:click="display='emails'">Emails</h4>
+            </div>
+            <div v-if="display === 'children'">
+                <ol class="admin-list">
+                    <ul v-for="child in list">
+                        <div class="col px-12px">
+                            <p v-for="(value, propertyName) in child">
+                                {{propertyName}}: {{value}}
+                            </p>
+                        </div>
+                    </ul>
+                </ol>
+            </div>
+            <div v-if="display === 'emails'">
+                <ol class="admin-list">
+                    <ul v-for="email in emails">
+                        <div class="col px-12px">
+                            <p v-for="(value, propertyName) in email">
+                                {{propertyName}}: {{value}}
+                            </p>
+                            <button class="btn"
+                                v-on:click="updateSentStatus(email['id'], email['sent'])">Resend</button>
+                        </div>
+                    </ul>
+                </ol>
+            </div>
+        </div>
+        <script>
+            new Vue({
+                el: "#app_loops",
+                data: {
+                    list: [
+
+                    ],
+                    emails: [
+
+                    ],
+                    display: "children",
+                    interval: null,
+                },
+                mounted() {
+                    this.getChildren()
+                    this.getEmails()
+                },
+                methods: {
+                    getChildren() {
+                        axios.get(`/admin/children`).then(response => { this.list = response.data })
+                    },
+                    getEmails() {
+                        axios.get(`/admin/emails`).then(response => { this.emails = response.data })
+                    },
+                    updateSentStatus(id, status) {
+                        axios.patch(`/admin/emails/${id}`, { status: status ? 0 : 1 }).then(() => this.getEmails())
+                    },
+                },
+                created() {
+                    this.interval = setInterval(() => {
+                        this.getChildren();
+                        this.getEmails();
+                    }, 500)
+                },
+                destroyed(){
+                    clearInterval(this.interval)
+                }
+            })
+            axios.get(`/admin/children`).then(response => { this.list = response.data })
+        </script>
+    </main>
+
+</body>
+
+</html>
